@@ -18,10 +18,8 @@ public class Solution {
     }
     int middle = (from + to) / 2;
     TreeNode node = new TreeNode(nums[middle]);
-    if (from != to) {
-      node.left = sortedArrayToBST(nums, from, middle - 1);
-      node.right = sortedArrayToBST(nums, middle + 1, to);
-    }
+    node.left = sortedArrayToBST(nums, from, middle - 1);
+    node.right = sortedArrayToBST(nums, middle + 1, to);
     return node;
   }
 }
