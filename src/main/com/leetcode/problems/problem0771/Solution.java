@@ -1,4 +1,4 @@
-package main.com.leetcode.problems.problem771;
+package main.com.leetcode.problems.problem0771;
 
 import java.util.HashSet;
 import java.util.Set;
