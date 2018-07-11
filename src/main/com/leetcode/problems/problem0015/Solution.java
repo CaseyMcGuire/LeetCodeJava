@@ -5,54 +5,64 @@ import java.util.*;
 public class Solution {
 
   public List<List<Integer>> threeSum(int[] nums) {
-    Set<List<Integer>> uniqueTriples = new HashSet<>();
-    Map<Integer, Integer> numToFrequency = getNumToFrequency(nums);
-    for (int i = 0; i < nums.length; i++) {
-      if (nums[i] > 0) {
-        break;
-      }
-      for (int j = i + 1; j < nums.length; j++) {
-        int sum = nums[i] + nums[j];
-        int remainder = -sum;
-        Integer frequency = numToFrequency.get(remainder);
-        if (frequency != null) {
-          int numRequired = getFrequencyRequired(nums[i], nums[j], remainder);
-          if (frequency >= numRequired) {
-            List<Integer> triplet = Arrays.asList(nums[i], nums[j], remainder);
-            Collections.sort(triplet);
-            uniqueTriples.add(triplet);
-          }
-        }
-      }
-    }
-    return new ArrayList<>(uniqueTriples);
-  }
-
-  private Map<Integer, Integer> getNumToFrequency(int[] nums) {
-    Map<Integer, Integer> numToFrequency = new HashMap<>();
+    FrequencyMap frequencyMap = new FrequencyMap();
+    Set<List<Integer>> triplets = new HashSet<>();
     for (int num : nums) {
-      int curFrequency = numToFrequency.getOrDefault(num, 0);
-      numToFrequency.put(num, curFrequency + 1);
+      frequencyMap.incrementNum(num);
     }
-    return numToFrequency;
+    for (int i = 0; i < nums.length; i++) {
+      int firstNum = nums[i];
+      frequencyMap.decrementNum(firstNum);
+      for (int j = i + 1; j < nums.length; j++) {
+        int secondNum = nums[j];
+        frequencyMap.decrementNum(secondNum);
+        int remainder = 0 - (firstNum + secondNum);
+        Integer frequency = frequencyMap.getFrequency(remainder);
+        if (frequency != null) {
+          triplets.add(createSortedTriplet(firstNum, secondNum, remainder));
+        }
+        frequencyMap.incrementNum(secondNum);
+      }
+      frequencyMap.incrementNum(firstNum);
+    }
+    return new ArrayList<>(triplets);
   }
 
-  private int getFrequencyRequired(int first, int second, int third) {
-    int frequencyRequired = 1;
-    if (first == second) {
-      frequencyRequired++;
-    }
-    else if (first == third) {
-      frequencyRequired++;
-    }
-    if (second == third) {
-      frequencyRequired++;
-    }
-    return frequencyRequired;
+  private List<Integer> createSortedTriplet(int first, int second, int third) {
+    List<Integer> sortedList = new ArrayList<>();
+    sortedList.add(first);
+    sortedList.add(second);
+    sortedList.add(third);
+    Collections.sort(sortedList);
+    return sortedList;
   }
 
+  private static class FrequencyMap {
+    private final Map<Integer, Integer> numToFrequency;
+    FrequencyMap() {
+      numToFrequency = new HashMap<>();
+    }
+
+    void incrementNum(int num) {
+      numToFrequency.merge(num, 1, (cur, iter) -> cur + iter);
+    }
+
+    void decrementNum(int num) {
+      Integer frequency = numToFrequency.get(num);
+      if (frequency == 1) {
+        numToFrequency.remove(num);
+      }
+      else {
+        numToFrequency.put(num, frequency - 1);
+      }
+    }
+
+    Integer getFrequency(int num) {
+      return numToFrequency.get(num);
+    }
+  }
 
   public static void main(String[] args) {
-    System.out.println(new Solution().threeSum(new int[]{-1, 0, 1, 2, -1, -4}));
+    System.out.println(new Solution().threeSum(new int[]{-1,0,1,2,-1,-4}));
   }
 }

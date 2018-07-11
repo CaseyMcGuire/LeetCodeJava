@@ -1,5 +1,7 @@
 package main.com.leetcode.explore.problem0000;
 
+import main.com.leetcode.datastructures.Node;
+
 public class Solution {
 
   public Node insert(Node head, int insertVal) {
@@ -40,16 +42,6 @@ public class Solution {
       return true;
     }
     return false;
-  }
-
-  public static class Node {
-    public int val;
-    public Node next;
-
-    public Node(int _val,Node _next) {
-      val = _val;
-      next = _next;
-    }
   }
 }
 
