@@ -10,8 +10,10 @@ class Solution {
       return false;
     }
 
-    int startIndex = s.charAt(0) == '-' ? 1 : 0;
-    if (startIndex == s.length()) {
+    if (s.startsWith("-") || s.startsWith("+")) {
+      s = s.substring(1, s.length());
+    }
+    if (s.startsWith(".e")) {
       return false;
     }
 
@@ -24,37 +26,52 @@ class Solution {
     }
     boolean allowExponent = true;
     boolean allowDecimal = true;
-    for (int i = startIndex; i < s.length(); i++) {
+    for (int i = 0; i < s.length(); i++) {
       boolean isExponent = s.charAt(i) == 'e';
       boolean isDecimal = s.charAt(i) == '.';
-      boolean isNegative = s.charAt(i) == '-';
-      if ((isExponent || isNegative) && (i == startIndex || i == s.length() - 1)) {
+      boolean isSign = s.charAt(i) == '-' || s.charAt(i) == '+';
+      if ((isExponent || isSign) && (i == 0 || i == s.length() - 1)) {
         return false;
       }
       else if (isExponent) {
-        boolean isValidPlace = Character.isDigit(s.charAt(i - 1)) && (s.charAt(i + 1) == '-' || Character.isDigit(s.charAt(i + 1)));
-        if (!allowExponent || !isValidPlace) {
+
+        if (!allowExponent || !isValidPlace(s, i)) {
           return false;
         }
         allowExponent = false;
         allowDecimal = false;
       }
       else if (isDecimal) {
-        boolean isValidPlace = i == s.length() - 1 ||
-            Character.isDigit(s.charAt(i - 1)) && Character.isDigit(s.charAt(i + 1));
-        if (!allowDecimal || !isValidPlace) {
+
+        if (!allowDecimal || !isValidPlace(s, i)) {
           return false;
         }
         allowDecimal = false;
       }
-      else if (isNegative) {
-        if (s.charAt(i - 1) != 'e' || !Character.isDigit(s.charAt(i + 1))) {
+      else if (isSign) {
+        if (!isValidPlace(s, i)) {
           return false;
         }
       }
       else if (!Character.isDigit(s.charAt(i))) {
         return false;
       }
+    }
+    return true;
+  }
+
+  private boolean isValidPlace(String s, int i) {
+    char c = s.charAt(i);
+    if (c == 'e') {
+      boolean validPreviousChar = s.charAt(i - 1) == '.' || Character.isDigit(s.charAt(i - 1));
+      boolean validNextChar = s.charAt(i + 1) == '-' || s.charAt(i + 1) == '+' || Character.isDigit(s.charAt(i + 1));
+      return validPreviousChar && validNextChar;
+    }
+    else if (c == '.') {
+      return i == s.length() - 1 || Character.isDigit(s.charAt(i - 1)) && (Character.isDigit(s.charAt(i + 1)) || s.charAt(i + 1) == 'e');
+    }
+    else if (c == '-' || c == '+') {
+      return s.charAt(i - 1) == 'e' && Character.isDigit(s.charAt(i + 1));
     }
     return true;
   }
